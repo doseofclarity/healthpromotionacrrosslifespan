@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Health Promotion Across Family Lifespan – PHN Philippines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0f766e; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .locked-section { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fde047;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+    </style>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile header -->
+    <div class="md:hidden bg-teal-900 text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40"><i class="fa-solid fa-bars text-2xl"></i></button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none">Family Lifespan Health</h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-teal-800 to-teal-700 text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-solid fa-family text-teal-200 mr-2"></i> Family Lifespan</h1>
+            <p class="text-sm text-teal-100 mt-1">Health Promotion · PHN Guide</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-teal-100 text-teal-900 border-r-4 border-teal-800 transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden text-slate-400"></i> Home / Start</button></li>
+                <li><button onclick="showSection('intro_family')" id="btn-intro_family" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-people-arrows w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Family Health Concept</button></li>
+                <li><button onclick="showSection('maternal_child')" id="btn-maternal_child" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-baby-carriage w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Maternal & Child Health</button></li>
+                <li><button onclick="showSection('adolescent')" id="btn-adolescent" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-face-smile w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Adolescent & Youth</button></li>
+                <li><button onclick="showSection('adult_health')" id="btn-adult_health" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-person-walking w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Adult Health (Men & Women)</button></li>
+                <li><button onclick="showSection('older_persons')" id="btn-older_persons" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-cane w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Older Persons</button></li>
+                <li><button onclick="showSection('family_planning_nutrition')" id="btn-family_planning_nutrition" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-apple-alt w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> FP & Nutrition / Oral Health</button></li>
+                <li><button onclick="showSection('phn_role')" id="btn-phn_role" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-user-nurse w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> PHN Role & Lifespan</button></li>
+                <li><button onclick="showSection('mnemonics')" id="btn-mnemonics" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-brain w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Mnemonic Appendix</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-teal-600 mr-1"></i> Active Recall</span>
+            <span class="mr-3 text-sm font-bold text-slate-700 md:hidden"><i class="fa-solid fa-brain text-teal-600"></i></span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-teal-900 to-teal-700 text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-children text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-teal-200 mb-6 shadow-sm border border-white/20"><i class="fa-solid fa-calendar-alt text-5xl"></i></div>
+                        <h3 class="text-xl font-bold text-teal-200 mb-2 uppercase tracking-widest">DOH Framework</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">Health Promotion<br>Across Family Lifespan</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">“The family is the basic unit of the community – PHN empowers families across all life stages.”</p>
+                        </div>
+                        <button onclick="unlockFirstSection()" class="bg-teal-600 hover:bg-teal-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">Begin Module <i class="fa-solid fa-arrow-right ml-3"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 1: Family Health Concept -->
+            <section id="intro_family" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-people-arrows text-teal-600 mr-4"></i> Family Health: The Core Unit</h2>
+                    <p>The Department of Health (DOH) uses a <span class="reveal-text font-bold">life span approach</span>, viewing health care of individuals within the context of the family. The Family Health Office aims to improve survival, health and well-being across all stages: pre-pregnancy, prenatal, natal, postnatal, newborn, child, adolescent, adult and older person.</p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-5">
+                        <div class="bg-teal-50 p-4 rounded-xl"><i class="fa-solid fa-star-of-life text-teal-700"></i> <strong>Key strategies:</strong> BEMOC (Basic Emergency Obstetric Care), IMCI, EPI, Healthy Lifestyle promotion.</div>
+                        <div class="bg-teal-50 p-4 rounded-xl"><i class="fa-solid fa-chart-line"></i> <strong>Millennium Development Goals</strong> – MDG 4 (child mortality), MDG 5 (maternal health) remain priorities.</div>
+                    </div>
+                    <button onclick="openQuiz('intro_family')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 2: Maternal & Child Health -->
+            <section id="maternal_child" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-baby-carriage text-teal-600 mr-4"></i> Maternal & Child Health</h2>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Maternal Health:</strong> At least <span class="reveal-text">4 prenatal visits</span>; TT immunization (Fully Immunized Mother); iron & folic acid supplementation; skilled birth attendance; BEMOC facilities.</li>
+                        <li><strong>Infant & Young Child Feeding:</strong> Exclusive breastfeeding for first <span class="reveal-text">6 months</span>; complementary feeding at 6 months while continuing breastfeeding up to 2 years.</li>
+                        <li><strong>Expanded Program on Immunization (EPI):</strong> Fully Immunized Child (BCG, DPT-HepB, OPV, Measles) before 1 year old. Hepatitis B at birth.</li>
+                        <li><strong>IMCI (Integrated Management of Childhood Illness):</strong> Assess, classify, treat for pneumonia, diarrhea, malnutrition, measles, etc.</li>
+                        <li><strong>Newborn Screening:</strong> R.A. 9288 – screening for metabolic disorders within 48 hours–2 weeks.</li>
+                    </ul>
+                    <button onclick="openQuiz('maternal_child')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 3: Adolescent & Youth -->
+            <section id="adolescent" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-face-smile text-teal-600 mr-4"></i> Adolescent & Youth Health (10–24 years)</h2>
+                    <p>Adolescents account for >30% of Philippine population. Leading causes of death: accidents & injuries (30.68/100,000). Key thrusts:</p>
+                    <ul class="list-disc pl-5 mt-3">
+                        <li>Adolescent-friendly health services & environments.</li>
+                        <li>Fertility awareness, sexuality education, prevention of teenage pregnancy.</li>
+                        <li>Substance abuse prevention: smoking prevalence 21%, alcohol 41%.</li>
+                        <li>Reproductive health counseling, family planning for sexually active young people.</li>
+                        <li>Nutrition, mental health, dental care package.</li>
+                    </ul>
+                    <div class="bg-amber-50 p-3 rounded mt-4"><i class="fa-regular fa-lightbulb"></i> Essential package: management of illness, RTI/STI counseling, responsible sexual behavior.</div>
+                    <button onclick="openQuiz('adolescent')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 4: Adult Health (Men & Women) -->
+            <section id="adult_health" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-person-walking text-teal-600 mr-4"></i> Adult Health (25–59 years)</h2>
+                    <p>Leading causes of death: Cardiovascular diseases, cancers, COPD, diabetes – lifestyle-related. Major risk factors: smoking, physical inactivity, unhealthy diet, hypertension.</p>
+                    <div class="grid md:grid-cols-2 gap-5 mt-3">
+                        <div class="bg-pink-50 p-3 rounded"><strong>Women’s health:</strong> Breast cancer (#1), cervical cancer – promote BSE, Pap smear. High rates of goiter, thyroid disorders.</div>
+                        <div class="bg-blue-50 p-3 rounded"><strong>Men’s health:</strong> Higher mortality from accidents, chronic liver disease, TB. Prostate health: DRE, PSA.</div>
+                    </div>
+                    <p class="mt-3">Health promotion: Healthy lifestyle (non-smoking, balanced diet, physical activity), early screening for hypertension, diabetes, hypercholesterolemia.</p>
+                    <button onclick="openQuiz('adult_health')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 5: Older Persons -->
+            <section id="older_persons" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-cane text-teal-600 mr-4"></i> Older Persons (60+ years)</h2>
+                    <p>6% of population (5 million). Double burden: degenerative + communicable diseases. Top causes: heart disease, vascular disease, cancer, pneumonia, COPD. Common geriatric problems: difficulty walking, chewing, visual/hearing impairment, osteoporosis, arthritis.</p>
+                    <ul class="list-disc pl-5 space-y-1 mt-2">
+                        <li><strong>Essential health care package:</strong> management of chronic illness, nutrition counseling, dental care, screening for hypertension/diabetes.</li>
+                        <li><strong>R.A. 9257 (Expanded Senior Citizens Act):</strong> 20% discount, free medical and dental check-ups in government hospitals.</li>
+                        <li>Community-based and institution-based models for elderly care.</li>
+                    </ul>
+                    <button onclick="openQuiz('older_persons')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 6: Family Planning, Nutrition, Oral Health -->
+            <section id="family_planning_nutrition" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-apple-alt text-teal-600 mr-4"></i> FP, Nutrition & Oral Health</h2>
+                    <p><strong>Family Planning:</strong> Contraceptive prevalence rate ~48.9% (2003). Methods: pills, injectables, IUD, condom, BTL, vasectomy, LAM, SDM, two-day method. Birth spacing 3-5 years reduces maternal & child mortality.</p>
+                    <p><strong>Nutrition Program:</strong> Micronutrient supplementation (Vitamin A for 6-71 months, iron for pregnant/lactating, iodine). Food Fortification Act (R.A. 8976). Promote Nutritional Guidelines for Filipinos.</p>
+                    <p><strong>Oral Health:</strong> Dental caries (92%) and periodontal disease (78%). Basic package: oral exam, prophylaxis, fluoride, ART, supervised toothbrushing.</p>
+                    <button onclick="openQuiz('family_planning_nutrition')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- SECTION 7: PHN Role across Lifespan -->
+            <section id="phn_role" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-user-nurse text-teal-600 mr-4"></i> PHN Role in Lifespan Health Promotion</h2>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Antenatal & postnatal:</strong> Provide prenatal counseling, TT immunization, micronutrients, breastfeeding support, postpartum visits (1st week and 6 weeks).</li>
+                        <li><strong>Child health:</strong> Supervise EPI, IMCI, growth monitoring, newborn screening, deworming, oral health education.</li>
+                        <li><strong>Adolescent:</strong> Organize youth-friendly health sessions, STI/HIV prevention, substance abuse education.</li>
+                        <li><strong>Adult:</strong> Screen for hypertension, diabetes, cancers (BSE/CBE, Pap smear), promote healthy lifestyle (smoking cessation, physical activity, diet).</li>
+                        <li><strong>Older persons:</strong> Facilitate access to senior citizen benefits, home visits, chronic disease management, fall prevention.</li>
+                        <li>Use nursing process, home visit, community organizing, and referral system.</li>
+                    </ul>
+                    <button onclick="openQuiz('phn_role')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-teal-400"></i> Take Quiz → Unlock Appendix & Final Exam</button>
+                </div>
+            </section>
+
+            <!-- Mnemonics -->
+            <section id="mnemonics" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-teal-600 pb-3"><i class="fa-solid fa-brain text-teal-600 mr-4"></i> Mnemonic Appendix</h2>
+                    <div class="overflow-x-auto rounded-xl border">
+                        <table class="w-full text-sm md:text-base">
+                            <thead class="bg-teal-800 text-white"><tr><th class="p-3">Concept</th><th class="p-3">Mnemonic</th><th class="p-3">Meaning</th></tr></thead>
+                            <tbody class="divide-y">
+                                <tr><td class="p-3 font-semibold">Exclusive breastfeeding</td><td class="font-black text-teal-700">6 months</td><td class="reveal-text">Only breastmilk, no other liquids/solids for first 6 months</td></tr>
+                                <tr class="bg-slate-50"><td class="p-3 font-semibold">Fully Immunized Child (FIC)</td><td class="font-black text-teal-700">1 BCG, 3 OPV, 3 DPT, 3 HepB, 1 Measles</td><td class="reveal-text">Before 1st birthday</td></tr>
+                                <tr><td class="p-3 font-semibold">Maternal TT doses for lifetime protection</td><td class="font-black text-teal-700">5 Doses</td><td class="reveal-text">TT1→TT2→TT3→TT4→TT5 (lifetime immunity)</td></tr>
+                                <tr class="bg-slate-50"><td class="p-3 font-semibold">Essential newborn care</td><td class="font-black text-teal-700">UNANG Yakap</td><td class="reveal-text">Immediate drying, cord clamping, skin-to-skin, breastfeeding</td></tr>
+                                <tr><td class="p-3 font-semibold">Healthy lifestyle components</td><td class="font-black text-teal-700">N.E.S.T.</td><td class="reveal-text">Nutrition, Exercise, Smoking cessation, stress management</td></tr>
+                                <tr class="bg-slate-50"><td class="p-3 font-semibold">Elderly benefits (R.A. 9257)</td><td class="font-black text-teal-700">20% discount</td><td class="reveal-text">On services, medicines, transport, hotels, restaurants</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button onclick="openQuiz('final_quiz')" class="mt-8 w-full bg-amber-500 text-slate-900 font-black py-4 rounded-xl shadow-md hover:bg-amber-400 transition-colors text-lg"><i class="fa-solid fa-graduation-cap mr-3"></i> Take Final 50‑Item Exam</button>
+                </div>
+            </section>
+
+            <!-- FINAL QUIZ SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-400 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Comprehensive Final Exam</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">You have unlocked all modules. Demonstrate mastery of health promotion across the family lifespan – 50 items, 75% to pass.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors text-xl">Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- MODAL FOR QUIZZES -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <p class="text-slate-600 mb-6 font-medium border-b pb-4">Score ≥75% to unlock next section.</p>
+            <div id="quiz-questions-container" class="space-y-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-teal-700 text-white font-bold py-4 rounded-xl hover:bg-teal-800 transition-colors shadow-lg text-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100 border"></div>
+        </div>
+    </div>
+
+    <script>
+        let unlockedSections = ['home'];
+
+        // QUIZ DATA (7 sections + final)
+        const quizzes = {
+            intro_family: { title: "Family Health Concept", next: "maternal_child", questions: [
+                { q: "The DOH uses which approach for family health?", options: ["Life span approach", "Disease-oriented", "Curative only", "Institutional"], ans: 0 },
+                { q: "What does BEMOC stand for?", options: ["Basic Emergency Obstetric Care", "Birth Emergency Management", "Bacterial Emerging Care", "Breastfeeding Education"], ans: 0 },
+                { q: "The family is considered as:", options: ["Basic unit of community", "Secondary unit", "Hospital unit", "Individual focus"], ans: 0 },
+                { q: "Which MDG is directly related to maternal health?", options: ["MDG 4", "MDG 5", "MDG 6", "MDG 3"], ans: 1 },
+                { q: "Family Health Office aims to improve survival across all stages EXCEPT?", options: ["Prenatal", "Newborn", "Adolescent", "Only children under 5"], ans: 3 }
+            ] },
+            maternal_child: { title: "Maternal & Child Health", next: "adolescent", questions: [
+                { q: "Minimum number of prenatal visits recommended?", options: ["2", "4", "6", "8"], ans: 1 },
+                { q: "Exclusive breastfeeding should continue for how many months?", options: ["4 months", "6 months", "9 months", "12 months"], ans: 1 },
+                { q: "A Fully Immunized Child receives measles vaccine at what age?", options: ["Birth", "6 weeks", "9 months", "12 months"], ans: 2 },
+                { q: "Hepatitis B vaccine is given within how many hours after birth?", options: ["12 hours", "24 hours", "48 hours", "1 week"], ans: 1 },
+                { q: "IMCI stands for:", options: ["Integrated Management of Childhood Illness", "Immunization for Children", "Infant Mortality Control Initiative", "International Child Health"], ans: 0 },
+                { q: "Newborn Screening Act is R.A. ___?", options: ["9288", "9173", "7160", "7875"], ans: 0 }
+            ] },
+            adolescent: { title: "Adolescent & Youth Health", next: "adult_health", questions: [
+                { q: "Top cause of death among adolescents in the Philippines?", options: ["Suicide", "Accidents/injuries", "Pneumonia", "HIV/AIDS"], ans: 1 },
+                { q: "Which age group is covered by 'young people' (WHO)?", options: ["10-24 years", "15-30 years", "5-18 years", "13-19 years"], ans: 0 },
+                { q: "Smoking prevalence among Filipino adolescents is about:", options: ["10%", "21%", "35%", "50%"], ans: 1 },
+                { q: "Adolescent health package includes all EXCEPT:", options: ["STI counseling", "Family planning", "Geriatric care", "Nutrition counseling"], ans: 2 },
+                { q: "What is the unmet need for family planning among young women (15-24)?", options: ["10%", "26%", "40%", "5%"], ans: 1 }
+            ] },
+            adult_health: { title: "Adult Health (Men & Women)", next: "older_persons", questions: [
+                { q: "Leading cause of death among Filipino adult women?", options: ["Cervical cancer", "Cardiovascular diseases", "Tuberculosis", "Accidents"], ans: 1 },
+                { q: "Which cancer is the top cause of death among adult Filipino men?", options: ["Lung cancer", "Prostate cancer", "Colon cancer", "Liver cancer"], ans: 0 },
+                { q: "Best screening test for breast cancer for women over 40?", options: ["BSE", "CBE", "Mammogram", "Ultrasound"], ans: 2 },
+                { q: "Major lifestyle risk factors for NCDs include all EXCEPT:", options: ["Smoking", "Physical inactivity", "Unhealthy diet", "Immunization"], ans: 3 },
+                { q: "Prostate cancer screening for men includes:", options: ["PSA and DRE", "Chest X-ray", "Sputum exam", "Colonoscopy"], ans: 0 }
+            ] },
+            older_persons: { title: "Older Persons Health", next: "family_planning_nutrition", questions: [
+                { q: "What law gives senior citizens 20% discount?", options: ["R.A. 9257", "R.A. 9173", "R.A. 7875", "R.A. 7160"], ans: 0 },
+                { q: "Leading cause of death among older persons?", options: ["Accidents", "Heart diseases", "Pneumonia", "TB"], ans: 1 },
+                { q: "Percentage of elderly in Philippine population?", options: ["3%", "6%", "10%", "15%"], ans: 1 },
+                { q: "Common geriatric problems include all EXCEPT:", options: ["Osteoporosis", "Hearing loss", "Acute appendicitis", "Arthritis"], ans: 2 },
+                { q: "Which essential health service is for elderly?", options: ["Screening for hypertension/diabetes", "Immunization for rotavirus", "Prenatal care", "Family planning only"], ans: 0 }
+            ] },
+            family_planning_nutrition: { title: "FP, Nutrition & Oral Health", next: "phn_role", questions: [
+                { q: "Contraceptive prevalence rate (2003) among married women?", options: ["33%", "48.8%", "60%", "25%"], ans: 1 },
+                { q: "Birth spacing of how many years is recommended?", options: ["1-2 years", "3-5 years", ">5 years", "No interval"], ans: 1 },
+                { q: "Vitamin A capsule for children 12-71 months given every:", options: ["Month", "3 months", "6 months", "Year"], ans: 2 },
+                { q: "Food Fortification Act is R.A. ___?", options: ["8976", "9288", "7432", "8504"], ans: 0 },
+                { q: "Prevalence of dental caries in the Philippines?", options: ["50%", "78%", "92%", "60%"], ans: 2 }
+            ] },
+            phn_role: { title: "PHN Role across Lifespan", next: "mnemonics", questions: [
+                { q: "During postpartum, PHN should conduct visits at:", options: ["1st week & 6 weeks", "Daily", "After 2 months", "Only if sick"], ans: 0 },
+                { q: "Which is NOT a PHN responsibility for older persons?", options: ["Chronic disease management", "Fall prevention", "Curative surgery", "Referral to senior citizen benefits"], ans: 2 },
+                { q: "PHN can teach BSE to women starting at age:", options: ["15", "20", "30", "40"], ans: 1 },
+                { q: "In EPI, PHN role includes:", options: ["Cold chain maintenance", "Masterlisting", "Health education", "All of the above"], ans: 3 },
+                { q: "Which approach does PHN use to empower families?", options: ["Authoritarian", "Partnership & community organizing", "Paternalistic", "Curative only"], ans: 1 }
+            ] }
+        };
+
+        // Build final quiz (50 items) from previous sections
+        let finalQs = [];
+        for (let sec of ['intro_family','maternal_child','adolescent','adult_health','older_persons','family_planning_nutrition','phn_role']) {
+            finalQs = finalQs.concat(quizzes[sec].questions.slice(0,7));
+        }
+        while(finalQs.length < 50) finalQs.push({ q: "Exclusive breastfeeding is recommended for first ___ months.", options: ["4", "6", "8", "12"], ans: 1 });
+        quizzes['final_quiz'] = { title: "Final 50‑Item Exam (Family Lifespan)", next: null, questions: finalQs.slice(0,50) };
+
+        function unlockFirstSection() { if(!unlockedSections.includes('intro_family')) { unlockedSections.push('intro_family'); updateSidebarUI(); } showSection('intro_family'); }
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') { alert("Please pass the Active Recall Quiz in the previous section to unlock."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('bg-teal-100','text-teal-900','border-r-4','border-teal-800'); btn.classList.add('text-slate-600'); });
+            let active = document.getElementById('btn-'+sectionId);
+            if(active) { active.classList.remove('text-slate-600'); active.classList.add('bg-teal-100','text-teal-900','border-r-4','border-teal-800'); }
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+            document.querySelector('main').scrollTop = 0;
+        }
+        function updateSidebarUI() {
+            const sections = ['home','intro_family','maternal_child','adolescent','adult_health','older_persons','family_planning_nutrition','phn_role','mnemonics','final_quiz_sec'];
+            sections.forEach(sec => {
+                let btn = document.getElementById('btn-'+sec);
+                if(!btn) return;
+                let lockIcon = btn.querySelector('.fa-lock'), mainIcon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lockIcon) lockIcon.classList.add('hidden'); if(mainIcon) mainIcon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lockIcon) lockIcon.classList.remove('hidden'); if(mainIcon) mainIcon.classList.add('hidden'); }
+            });
+        }
+        let currentQuiz = null;
+        function openQuiz(sectionId) {
+            currentQuiz = sectionId;
+            let qd = quizzes[sectionId];
+            if(!qd) return;
+            document.getElementById('quiz-title').innerText = qd.title;
+            let container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            qd.questions.forEach((q, idx) => {
+                let html = `<div class="bg-slate-50 p-4 rounded-xl border mb-4" id="quiz-q-${idx}"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2" data-qidx="${idx}">`;
+                q.options.forEach((opt, oi) => {
+                    html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-teal-600"><span>${opt}</span></label>`;
+                });
+                html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`;
+                container.innerHTML += html;
+            });
+            document.getElementById('quiz-submit-btn').classList.remove('hidden');
+            document.getElementById('quiz-result-container').classList.add('hidden');
+            document.getElementById('quiz-modal').classList.remove('hidden');
+        }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            let qd = quizzes[currentQuiz];
+            if(!qd) return;
+            let score = 0;
+            for(let i=0;i<qd.questions.length;i++) {
+                let selected = document.querySelector(`input[name="q${i}"]:checked`);
+                let isCorrect = (selected && parseInt(selected.value) === qd.questions[i].ans);
+                if(isCorrect) score++;
+                let fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv) {
+                    fbDiv.classList.remove('hidden');
+                    let correctAns = qd.questions[i].options[qd.questions[i].ans];
+                    if(isCorrect) { fbDiv.innerHTML = `<span class="text-green-700"><i class="fa-solid fa-check-circle"></i> Correct</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-correct'); fbDiv.parentElement?.classList.remove('quiz-feedback-wrong'); }
+                    else { let selectedText = selected ? qd.questions[i].options[parseInt(selected.value)] : "None"; fbDiv.innerHTML = `<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Incorrect. Correct: ${correctAns}. Your answer: ${selectedText}</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-wrong'); fbDiv.parentElement?.classList.remove('quiz-feedback-correct'); }
+                }
+            }
+            let percent = (score/qd.questions.length)*100;
+            let resultDiv = document.getElementById('quiz-result-container');
+            let btn = document.getElementById('quiz-submit-btn');
+            btn.classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            if(percent >= 75) {
+                if(currentQuiz === 'final_quiz') { resultDiv.innerHTML = `<div class="text-amber-500 text-6xl text-center mb-4">🏅</div><h3 class="text-2xl font-black text-center">Certified!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><p class="mt-2 text-center text-green-700">You mastered Family Lifespan Health Promotion.</p><button onclick="closeQuiz()" class="mt-4 w-full bg-teal-700 text-white py-2 rounded-lg">Close</button>`; return; }
+                if(qd.next && !unlockedSections.includes(qd.next)) { unlockedSections.push(qd.next); if(qd.next === 'mnemonics') { unlockedSections.push('final_quiz_sec'); } updateSidebarUI(); }
+                resultDiv.innerHTML = `<div class="text-green-600 text-5xl text-center mb-4">✓</div><h3 class="text-2xl font-black text-center">Unlocked!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="closeQuiz(); showSection('${qd.next}')" class="mt-4 w-full bg-teal-700 text-white py-2 rounded-lg">Continue to Next Section</button>`;
+            } else {
+                resultDiv.innerHTML = `<div class="text-red-500 text-5xl text-center mb-4">✗</div><h3 class="text-2xl font-black text-center">Failed (need 75%)</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="openQuiz('${currentQuiz}')" class="mt-4 w-full bg-slate-600 text-white py-2 rounded-lg">Retry Quiz</button>`;
+            }
+        }
+        function toggleRecallMode() {
+            let active = !document.body.classList.contains('recall-mode');
+            let toggle = document.getElementById('recall-toggle'), knob = document.getElementById('recall-knob');
+            if(active) { document.body.classList.add('recall-mode'); toggle.classList.add('bg-teal-700'); knob.classList.add('translate-x-6'); }
+            else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-teal-700'); knob.classList.remove('translate-x-6'); }
+        }
+        function toggleMobileMenu() { let s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', () => { updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el => el.addEventListener('click', function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); })); });
+    </script>
+</body>
+</html>
